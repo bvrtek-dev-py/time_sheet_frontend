@@ -7,6 +7,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {HashRouter, Route, Routes} from "react-router-dom";
 import Header from "./components/global/Header/Header.tsx";
 import Home from "./components/modules/Home/Home.tsx";
+import {Login} from "./components/modules/Login/Login.tsx";
 
 const theme  = createTheme({});
 
@@ -26,6 +27,7 @@ export default function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />}></Route>
+            <Route path="/login" element={<Login />}></Route>
           </Routes>
         </MantineProvider>
       </QueryClientProvider>

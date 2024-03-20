@@ -1,8 +1,10 @@
 import {Button, Container, Text, Title} from '@mantine/core';
 import {Dots} from './Dots';
 import classes from './Home.module.css';
+import {useNavigate} from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate();
   return (
     <Container className={classes.wrapper} fluid>
       <Dots className={classes.dots} style={{ left: 0, top: 0 }} />
@@ -31,7 +33,7 @@ export default function Home() {
           <Button className={classes.control} size="lg" variant="default" color="gray">
             Sign up
           </Button>
-          <Button className={classes.control} size="lg">
+          <Button className={classes.control} size="lg" onClick={() => navigate("/login")}>
             Log in
           </Button>
         </div>
