@@ -1,10 +1,8 @@
-import { useState } from 'react';
-import { Container, Group } from '@mantine/core';
-import classes from './Header.module.css';
+import { useState } from "react";
+import { Container, Group } from "@mantine/core";
+import classes from "./Header.module.css";
 
-const links = [
-  { link: '/projects', label: 'Projects' },
-];
+const links = [{ link: "/projects", label: "Projects" }];
 
 export default function Header() {
   const [active, setActive] = useState(links[0].link);

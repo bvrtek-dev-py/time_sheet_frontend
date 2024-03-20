@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Anchor,
   Box,
   Button,
   Center,
@@ -103,6 +104,11 @@ export function Login() {
               Login
             </Button>
           </form>
+          <Center>
+            <Anchor href="/register" mt="md" underline="never">
+              Haven't signed up yet?
+            </Anchor>
+          </Center>
         </Container>
       </Paper>
     </Flex>
