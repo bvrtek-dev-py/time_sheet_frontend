@@ -1,14 +1,25 @@
-import { RegisterData } from "./api.types.ts";
+import { ProjectCreateData, ProjectData, RegisterData } from "./api.types.ts";
 
 const API_URL = "http://localhost:8000/api/v1";
 
 export async function GET<T>(url: string): Promise<T> {
+  const token = localStorage.getItem("access_token");
   const response = await fetch(
     url.startsWith("https") ? url : `${API_URL}${url}`,
+    {
+      method: "GET",
+      headers: { Authorization: token ? JSON.parse(token) : "" },
+    },
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch data");
+    const parsed = await response.json();
+
+    if (parsed.detail === "Not authenticated") {
+      await refreshToken();
+    }
+
+    throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
   }
 
   return response.json();
@@ -18,34 +29,52 @@ async function POST(
   url: string,
   body: FormData | Record<string, unknown> = {},
 ) {
+  const token = localStorage.getItem("access_token");
   const isMultipart = body instanceof FormData;
-  const contentType =
-    body instanceof FormData ? "multipart/form-data" : "application/json";
+  const jsonHeaders = {
+    Authorization: token ? JSON.parse(token) : "",
+    "Content-Type": "application/json",
+  };
+  const multipartHeaders = {
+    Authorization: token ? JSON.parse(token) : "",
+  };
 
   const response = await fetch(`${API_URL}${url}`, {
     method: "POST",
-    credentials: "include",
     body: isMultipart ? body : JSON.stringify(body, null, 2),
-    headers: {
-      "Content-Type": contentType,
-    },
+    headers: isMultipart ? multipartHeaders : jsonHeaders,
   });
 
+  console.log(response);
+
   if (!response.ok) {
-    throw new Error("Failed to post data");
+    const parsed = await response.json();
+
+    if (parsed.detail === "Not authenticated") {
+      refreshToken();
+    }
+
+    throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
   }
 
   return response.json();
 }
 
 async function DELETE(url: string) {
+  const token = localStorage.getItem("access_token");
   const response = await fetch(`${API_URL}${url}`, {
-    credentials: "include",
     method: "DELETE",
+    headers: { Authorization: token ? JSON.parse(token) : "" },
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete data");
+    const parsed = await response.json();
+
+    if (parsed.detail === "Not authenticated") {
+      await refreshToken();
+    }
+
+    throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
   }
 
   return response.json();
@@ -55,14 +84,20 @@ async function PUT<T>(
   url: string,
   body: Record<string, unknown> = {},
 ): Promise<T> {
+  const token = localStorage.getItem("access_token");
   const response = await fetch(`${API_URL}${url}`, {
-    credentials: "include",
     method: "PUT",
     body: JSON.stringify(body),
+    headers: { Authorization: token ? JSON.parse(token) : "" },
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update data");
+    const parsed = await response.json();
+
+    if (parsed.detail === "Not authenticated") {
+      refreshToken();
+    }
+    throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
   }
 
   return response.json();
@@ -79,4 +114,9 @@ const loginAsFormData = (username: string, password: string) => {
 
 export const login = (username: string, password: string) =>
   POST("/auth/login", loginAsFormData(username, password));
+
+export const refreshToken = () => POST("/auth/refresh-token");
 export const register = (data: RegisterData) => POST("/users", data);
+export const createProject = (data: ProjectCreateData) =>
+  POST("/projects", data);
+export const fetchProjects = () => GET<ProjectData[]>("/projects");

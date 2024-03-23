@@ -9,6 +9,7 @@ import Header from "./components/global/Header/Header.tsx";
 import Home from "./components/modules/Home/Home.tsx";
 import { Login } from "./components/modules/Login/Login.tsx";
 import Register from "./components/modules/Register/Register.tsx";
+import Projects from "./components/modules/Projects/Projects.tsx";
 
 const theme = createTheme({});
 
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/" element={<Home />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/register" element={<Register />}></Route>
+          <Route path="/projects" element={<Projects />}></Route>
         </Routes>
       </MantineProvider>
     </QueryClientProvider>
