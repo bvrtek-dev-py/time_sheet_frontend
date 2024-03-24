@@ -4,13 +4,11 @@ const API_URL = "http://localhost:8000/api/v1";
 
 export async function GET<T>(url: string): Promise<T> {
   const token = localStorage.getItem("access_token");
-  const response = await fetch(
-    url.startsWith("https") ? url : `${API_URL}${url}`,
-    {
-      method: "GET",
-      headers: { Authorization: token ? JSON.parse(token) : "" },
-    },
-  );
+
+  const response = await fetch(`${API_URL}${url}`, {
+    method: "GET",
+    headers: { Authorization: token ? JSON.parse(token) : "" },
+  });
 
   if (!response.ok) {
     const parsed = await response.json();
@@ -45,13 +43,11 @@ async function POST(
     headers: isMultipart ? multipartHeaders : jsonHeaders,
   });
 
-  console.log(response);
-
   if (!response.ok) {
     const parsed = await response.json();
 
     if (parsed.detail === "Not authenticated") {
-      refreshToken();
+      await refreshToken();
     }
 
     throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
@@ -85,17 +81,23 @@ async function PUT<T>(
   body: Record<string, unknown> = {},
 ): Promise<T> {
   const token = localStorage.getItem("access_token");
+
+  const jsonHeaders = {
+    Authorization: token ? JSON.parse(token) : "",
+    "Content-Type": "application/json",
+  };
+
   const response = await fetch(`${API_URL}${url}`, {
     method: "PUT",
-    body: JSON.stringify(body),
-    headers: { Authorization: token ? JSON.parse(token) : "" },
+    body: JSON.stringify(body, null, 2),
+    headers: jsonHeaders,
   });
 
   if (!response.ok) {
     const parsed = await response.json();
 
     if (parsed.detail === "Not authenticated") {
-      refreshToken();
+      await refreshToken();
     }
     throw new Error(parsed[0]?.messages?.[0].message || parsed.message);
   }
