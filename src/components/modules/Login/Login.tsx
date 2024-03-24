@@ -18,9 +18,9 @@ import { IconInfoCircle } from "@tabler/icons-react";
 import classes from "./Login.module.css";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "@mantine/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "../../../api/api.ts";
+import { useLocalStorage } from "@mantine/hooks";
 
 export function Login() {
   const form = useForm({
@@ -63,7 +63,7 @@ export function Login() {
   const { mutate } = useMutation({
     mutationFn: () => login(form.values.username, form.values.password),
     onSuccess: (response) => {
-      setAccessToken(response.access_token);
+      setAccessToken(`Bearer ${response.access_token}`);
       setRefreshToken(response.refresh_token);
       navigate("/");
     },
